@@ -1,0 +1,76 @@
+
+#include <stdio.h>
+
+#define SLAB1_UNITS 100
+#define SLAB2_UNITS 200
+#define RATE1_PAISE 0
+#define RATE2_PAISE 225
+#define RATE3_PAISE 450
+#define FIXED_CHARGE_PAISE 5000L
+#define METER_MAX 65535
+
+int main(void)
+{
+    int householdNumber;
+    int previousReading, currentReading;
+    unsigned int units;
+    long energyCharge = 0;
+    long totalBill;
+
+    printf("Enter household number: ");
+    if (scanf("%d", &householdNumber) != 1 ||
+        householdNumber <= 0) {
+        printf("Invalid household number.\n");
+        return 1;
+    }
+
+    printf("Enter previous meter reading: ");
+    if (scanf("%d", &previousReading) != 1 ||
+        previousReading < 0 || previousReading > METER_MAX) {
+        printf("Invalid previous reading.\n");
+        return 1;
+    }
+
+    printf("Enter current meter reading: ");
+    if (scanf("%d", &currentReading) != 1 ||
+        currentReading < 0 || currentReading > METER_MAX) {
+        printf("Invalid current reading.\n");
+        return 1;
+    }
+
+    /* Calculate units, including one meter rollover */
+    if (currentReading >= previousReading) {
+        units = (unsigned int)(currentReading - previousReading);
+    } else {
+        units = (unsigned int)(METER_MAX - previousReading + 1
+                               + currentReading);
+    }
+
+    /* Calculate energy charge in paise */
+    if (units <= SLAB1_UNITS) {
+        energyCharge = units * RATE1_PAISE;
+    } else if (units <= SLAB2_UNITS) {
+        energyCharge = (SLAB1_UNITS * RATE1_PAISE)
+                     + (units - SLAB1_UNITS) * RATE2_PAISE;
+    } else {
+        energyCharge = (SLAB1_UNITS * RATE1_PAISE)
+                     + ((SLAB2_UNITS - SLAB1_UNITS) * RATE2_PAISE)
+                     + (units - SLAB2_UNITS) * RATE3_PAISE;
+    }
+
+    totalBill = energyCharge + FIXED_CHARGE_PAISE;
+
+    printf("\n--- Electricity Bill ---\n");
+    printf("Household Number: %d\n", householdNumber);
+    printf("Previous Reading: %d\n", previousReading);
+    printf("Current Reading: %d\n", currentReading);
+    printf("Units Consumed: %u\n", units);
+    printf("Energy Charge: Rs %ld.%02ld\n",
+           energyCharge / 100, energyCharge % 100);
+    printf("Fixed Charge: Rs %ld.%02ld\n",
+           FIXED_CHARGE_PAISE / 100, FIXED_CHARGE_PAISE % 100);
+    printf("Total Bill: Rs %ld.%02ld\n",
+           totalBill / 100, totalBill % 100);
+
+    return 0;
+}
