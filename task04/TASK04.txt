@@ -1,0 +1,41 @@
+
+#include <stdio.h>
+
+/* Macros for simple calculations */
+#define RUPEES_TO_PAISE(rupees) ((rupees) * 100)
+#define SQUARE(x) ((x) * (x))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
+/* Inline functions: safer alternatives */
+static inline int square_function(int x)
+{
+    return x * x;
+}
+
+static inline int max_function(int a, int b)
+{
+    return (a > b) ? a : b;
+}
+
+int main(void)
+{
+    int a = 4;
+    int b = 7;
+    int i = 5;
+    int j = 8;
+
+    printf("Rupees to paise: %d\n", RUPEES_TO_PAISE(25));
+    printf("Square of a: %d\n", SQUARE(a));
+    printf("Square of a + 1: %d\n", SQUARE(a + 1));
+    printf("Larger value: %d\n", MAX(a, b));
+
+    printf("Inline square: %d\n", square_function(a + 1));
+    printf("Inline maximum: %d\n", max_function(a, b));
+
+    /* Demonstrate why MAX(i++, j) is unsafe */
+    i = 5;
+    printf("Unsafe MAX result: %d\n", MAX(i++, j));
+    printf("Value of i after MAX: %d\n", i);
+
+    return 0;
+}
