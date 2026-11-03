@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define READINGS_PER_YEAR 35040
+#define MAX_READINGS 35040
+#define MAX_WH_PER_READING 1000000ULL
+#define MAX_TARIFF_PAISE_PER_KWH 1000000LL
+#define PEAK_START_HOUR 18
+#define PEAK_END_HOUR 22
+#define PEAK_PERCENT 120
+
+/*
+Task 12 design:
+- Use unsigned long long for watt-hours and yearly energy totals.
+- Use long long for money in milli-paise to avoid rounding each reading.
+- Read tariff values at run time; they are not fixed with #define.
+- This example accepts up to 1,000,000 Wh per reading and checks inputs.
+- At that limit, yearly energy is 35,040,000,000 Wh.
+*/
+
+int main(void)
+{
+    long long normal_rate;
+    int readings, i;
+    unsigned long long wh;
+    unsigned long long yearly_wh = 0;
+    long long total_milli_paise = 0;
+
+    printf("Normal tariff (paise per kWh): ");
+    if (scanf("%lld", &normal_rate) != 1 ||
+        normal_rate < 0 ||
+        normal_rate > MAX_TARIFF_PAISE_PER_KWH) {
+        printf("Invalid tariff.\n");
+        return 1;
+    }
+
+    printf("Number of readings (1-%d): ", MAX_READINGS);
+    if (scanf("%d", &readings) != 1 ||
+        readings < 1 || readings > MAX_READINGS) {
+        printf("Invalid number of readings.\n");
+        return 1;
+    }
+
+    for (i = 0; i < readings; i++) {
+        int hour;
+        int peak;
+        long long charge_milli_paise;
+
+        printf("Reading %d: enter Wh and hour (0-23): ", i + 1);
+        if (scanf("%llu %d", &wh, &hour) != 2 ||
+            wh > MAX_WH_PER_READING ||
+            hour < 0 || hour > 23) {
+            printf("Invalid reading or hour.\n");
+            return 1;
+        }
+
+        if (wh > ULLONG_MAX - yearly_wh) {
+            printf("Yearly energy total overflow.\n");
+            return 1;
+        }
+        yearly_wh += wh;
+
+        peak = (hour >= PEAK_START_HOUR && hour < PEAK_END_HOUR);
+
+        /* Wh × paise/kWh gives milli-paise. */
+        charge_milli_paise = (long long)wh * normal_rate;
+
+        if (peak) {
+            charge_milli_paise =
+                charge_milli_paise * PEAK_PERCENT / 100;
+        }
+
+        if (charge_milli_paise > LLONG_MAX - total_milli_paise) {
+            printf("Bill total overflow.\n");
+            return 1;
+        }
+        total_milli_paise += charge_milli_paise;
+    }
+
+    printf("\n--- Annual Summary ---\n");
+    printf("Readings processed: %d\n", readings);
+    printf("Energy: %llu Wh\n", yearly_wh);
+    printf("Energy: %llu kWh and %llu Wh\n",
+           yearly_wh / 1000, yearly_wh % 1000);
+    printf("Total bill: Rs %lld.%02lld\n",
+           total_milli_paise / 100000,
+           (total_milli_paise % 100000) / 1000);
+
+    printf("\nTest checks:\n");
+    printf("35040 readings/year = %d\n", READINGS_PER_YEAR);
+    printf("Maximum energy under this input limit = 35040000000 Wh\n");
+    printf("Peak period is 18:00 to 21:59; rate is 20%% higher.\n");
+    printf("Tariff can be revised by entering a new rate at start-up.\n");
+
+    return 0;
+}
