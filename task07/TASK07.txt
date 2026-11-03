@@ -1,0 +1,77 @@
+#include <stdio.h>
+
+int main(void)
+{
+    int householdNumber;
+    unsigned int units;
+    long amountPaise;
+    float voltage;
+    double currentReading;
+    char category;
+    char name[50];
+
+    printf("Enter household number: ");
+    if (scanf("%d", &householdNumber) != 1) {
+        printf("Invalid household number!\n");
+        return 1;
+    }
+
+    printf("Enter units consumed: ");
+    if (scanf("%u", &units) != 1) {
+        printf("Invalid units!\n");
+        return 1;
+    }
+
+    printf("Enter bill amount in paise: ");
+    if (scanf("%ld", &amountPaise) != 1) {
+        printf("Invalid bill amount!\n");
+        return 1;
+    }
+
+    printf("Enter voltage: ");
+    if (scanf("%f", &voltage) != 1) {
+        printf("Invalid voltage!\n");
+        return 1;
+    }
+
+    printf("Enter current reading: ");
+    if (scanf("%lf", &currentReading) != 1) {
+        printf("Invalid current reading!\n");
+        return 1;
+    }
+
+    printf("Enter category character: ");
+    if (scanf(" %c", &category) != 1) {
+        printf("Invalid category!\n");
+        return 1;
+    }
+
+    printf("Enter customer name (one word): ");
+    if (scanf("%49s", name) != 1) {
+        printf("Invalid name!\n");
+        return 1;
+    }
+
+    printf("\n--- Electricity Bill ---\n");
+    printf("Household number: %d\n", householdNumber);
+    printf("Units consumed: %u\n", units);
+    printf("Voltage: %.2f\n", voltage);
+    printf("Current reading: %.2f\n", currentReading);
+    printf("Category: %c\n", category);
+    printf("Customer name: %s\n", name);
+
+    printf("Bill amount: Rs %ld.%02ld\n",
+           amountPaise / 100, amountPaise % 100);
+
+    printf("\n--- Format Specifier Examples ---\n");
+    printf("int: %d\n", householdNumber);
+    printf("unsigned int: %u\n", units);
+    printf("long: %ld\n", amountPaise);
+    printf("long long: %lld\n", (long long)amountPaise);
+    printf("float: %f\n", voltage);
+    printf("double: %lf\n", currentReading);
+    printf("char: %c\n", category);
+    printf("string: %s\n", name);
+
+    return 0;
+}
