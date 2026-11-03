@@ -1,0 +1,47 @@
+#include <stdio.h>
+
+#define SLAB1_UNITS 100
+#define SLAB2_UNITS 200
+#define RATE1_PAISE 0
+#define RATE2_PAISE 225
+#define RATE3_PAISE 450
+#define FIXED_CHARGE_PAISE 5000L
+
+long compute_bill(int units)
+{
+    long paise = FIXED_CHARGE_PAISE;
+
+#ifdef DEBUG
+    printf("[DEBUG] Units: %d\n", units);
+    printf("[DEBUG] Fixed charge: %ld paise\n", paise);
+#endif
+
+    if (units > SLAB2_UNITS) {
+        paise += (SLAB2_UNITS - SLAB1_UNITS) * RATE2_PAISE;
+        paise += (units - SLAB2_UNITS) * RATE3_PAISE;
+    }
+    else if (units > SLAB1_UNITS) {
+        paise += (units - SLAB1_UNITS) * RATE2_PAISE;
+    }
+    else if (units > 0) {
+        paise += units * RATE1_PAISE;
+    }
+
+#ifdef DEBUG
+    printf("[DEBUG] Final bill: %ld paise\n", paise);
+#endif
+
+    return paise;
+}
+
+int main(void)
+{
+    int units = 150;
+    long bill = compute_bill(units);
+
+    printf("Units consumed: %d\n", units);
+    printf("Total bill: Rs %ld.%02ld\n",
+           bill / 100, bill % 100);
+
+    return 0;
+}
