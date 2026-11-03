@@ -1,0 +1,22 @@
+#include <stdio.h>
+
+#define FIXED_CHARGE_PAISE 5000L
+
+int main(void)
+{
+    long bill_paise = FIXED_CHARGE_PAISE;
+    int units;
+
+    printf("Enter units consumed: ");
+
+    if (scanf("%d", &units) != 1 || units < 0) {
+        printf("Invalid input.\n");
+        return 1;
+    }
+
+    printf("Units: %d\n", units);
+    printf("Bill: Rs %ld.%02ld\n",
+           bill_paise / 100, bill_paise % 100);
+
+    return 0;
+}
