@@ -1,0 +1,94 @@
+#include <stdio.h>
+
+#define MAX_READING 65535U
+#define SLAB1_UNITS 100U
+#define SLAB2_UNITS 200U
+
+#define RATE1_PAISE 0L
+#define RATE2_PAISE 225L
+#define RATE3_PAISE 450L
+#define FIXED_CHARGE_PAISE 5000L
+
+unsigned int get_units(unsigned int previous, unsigned int current)
+{
+    if (current >= previous)
+        return current - previous;
+
+    if (previous == MAX_READING)
+        return (MAX_READING - previous) + 1U + current;
+
+    return 0U;
+}
+
+long calculate_bill(unsigned int units)
+{
+    long bill = FIXED_CHARGE_PAISE;
+
+    if (units <= SLAB1_UNITS) {
+        bill += (long)units * RATE1_PAISE;
+    } else if (units <= SLAB2_UNITS) {
+        bill += (long)SLAB1_UNITS * RATE1_PAISE;
+        bill += (long)(units - SLAB1_UNITS) * RATE2_PAISE;
+    } else {
+        bill += (long)SLAB1_UNITS * RATE1_PAISE;
+        bill += (long)(SLAB2_UNITS - SLAB1_UNITS) * RATE2_PAISE;
+        bill += (long)(units - SLAB2_UNITS) * RATE3_PAISE;
+    }
+
+    return bill;
+}
+
+int main(void)
+{
+    unsigned int previous, current, units;
+    long bill;
+    int i;
+
+    unsigned int test_units[] = {0, 100, 150, 200, 350};
+    long expected[] = {5000, 5000, 16250, 27500, 95000};
+    long total = 0;
+
+    printf("=== Electricity Billing Program ===\n");
+
+    printf("Enter previous meter reading (0-65535): ");
+    if (scanf("%u", &previous) != 1 || previous > MAX_READING) {
+        printf("Invalid previous reading.\n");
+        return 1;
+    }
+
+    printf("Enter current meter reading (0-65535): ");
+    if (scanf("%u", &current) != 1 || current > MAX_READING) {
+        printf("Invalid current reading.\n");
+        return 1;
+    }
+
+    if (current < previous && previous != MAX_READING) {
+        printf("Invalid reading: decrease without valid rollover.\n");
+        return 1;
+    }
+
+    units = get_units(previous, current);
+    bill = calculate_bill(units);
+
+    printf("\nUnits consumed: %u\n", units);
+    printf("Electricity bill: Rs %ld.%02ld\n",
+           bill / 100, bill % 100);
+
+    printf("\n=== Five Test Bills ===\n");
+    printf("Units\tExpected\tActual\n");
+
+    for (i = 0; i < 5; i++) {
+        long actual = calculate_bill(test_units[i]);
+        printf("%u\tRs %ld.%02ld\tRs %ld.%02ld %s\n",
+               test_units[i],
+               expected[i] / 100, expected[i] % 100,
+               actual / 100, actual % 100,
+               actual == expected[i] ? "PASS" : "FAIL");
+        total += actual;
+    }
+
+    printf("Total of five bills: Rs %ld.%02ld\n",
+           total / 100, total % 100);
+
+    return 0;
+}
