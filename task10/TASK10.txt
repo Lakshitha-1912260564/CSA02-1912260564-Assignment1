@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <limits.h>
+#include <float.h>
+
+#define BILL_PAISE 95000LL
+
+int main(void)
+{
+    int counts[] = {4000, 60000, 800000};
+    int i;
+
+    float floatBill = 950.00f;
+    double doubleBill = 950.00;
+    long long paiseBill = BILL_PAISE;
+
+    printf("=== Data Type Sizes and Ranges ===\n");
+    printf("sizeof(int) = %zu bytes\n", sizeof(int));
+    printf("sizeof(long) = %zu bytes\n", sizeof(long));
+    printf("sizeof(long long) = %zu bytes\n", sizeof(long long));
+    printf("sizeof(float) = %zu bytes\n", sizeof(float));
+    printf("sizeof(double) = %zu bytes\n", sizeof(double));
+
+    printf("\nINT range: %d to %d\n", INT_MIN, INT_MAX);
+    printf("LONG range: %ld to %ld\n", LONG_MIN, LONG_MAX);
+    printf("LONG LONG range: %lld to %lld\n", LLONG_MIN, LLONG_MAX);
+    printf("FLT_DIG = %d decimal digits\n", FLT_DIG);
+    printf("DBL_DIG = %d decimal digits\n", DBL_DIG);
+
+    printf("\n=== District Bill Comparison ===\n");
+    printf("Bills\tFloat total (Rs)\tDouble total (Rs)\tPaise total (Rs)\n");
+
+    for (i = 0; i < 3; i++) {
+        int n = counts[i];
+
+        float floatTotal = floatBill * n;
+        double doubleTotal = doubleBill * n;
+        long long paiseTotal = paiseBill * n;
+
+        printf("%d\t%.2f\t\t%.2f\t\t%lld.%02lld\n",
+               n,
+               (double)floatTotal,
+               doubleTotal,
+               paiseTotal / 100,
+               paiseTotal % 100);
+    }
+
+    printf("\n=== Integer Overflow Test ===\n");
+
+    {
+        int bills = 800000;
+        int intTotal = bills * 95000;
+        long longTotal = (long)bills * 95000L;
+        long long longLongTotal = (long long)bills * 95000LL;
+
+        printf("int total: %d (overflow may have occurred)\n", intTotal);
+        printf("long total: %ld (check range for your system)\n", longTotal);
+        printf("long long total: %lld paise\n", longLongTotal);
+    }
+
+    printf("\n=== Double Precision Test ===\n");
+
+    {
+        double total = 0.0;
+        long long exactPaise = 0;
+        int bills;
+
+        for (bills = 0; bills < 800000; bills++) {
+            total += 950.00;
+            exactPaise += BILL_PAISE;
+        }
+
+        printf("Double total: Rs %.2f\n", total);
+        printf("Exact paise total: Rs %lld.%02lld\n",
+               exactPaise / 100, exactPaise % 100);
+        printf("Difference: Rs %.8f\n",
+               total - ((double)exactPaise / 100.0));
+    }
+
+    return 0;
+}
