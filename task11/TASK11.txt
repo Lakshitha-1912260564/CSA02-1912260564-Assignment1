@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define SLAB_COUNT 3
+#define SLAB1_LIMIT 100U
+#define SLAB2_LIMIT 200U
+
+#define RATE1_PAISE 0LL
+#define RATE2_PAISE 225LL
+#define RATE3_PAISE 450LL
+#define FIXED_CHARGE_PAISE 5000LL
+
+#define MAX_METER_READING 65535U
+#define DISTRICT_BILLS 800000
+
+long long calculate_bill(unsigned int units)
+{
+    long long bill = FIXED_CHARGE_PAISE;
+
+    if (units <= SLAB1_LIMIT) {
+        bill += (long long)units * RATE1_PAISE;
+    } else if (units <= SLAB2_LIMIT) {
+        bill += (long long)SLAB1_LIMIT * RATE1_PAISE;
+        bill += (long long)(units - SLAB1_LIMIT) * RATE2_PAISE;
+    } else {
+        bill += (long long)SLAB1_LIMIT * RATE1_PAISE;
+        bill += (long long)(SLAB2_LIMIT - SLAB1_LIMIT) * RATE2_PAISE;
+        bill += (long long)(units - SLAB2_LIMIT) * RATE3_PAISE;
+    }
+
+    return bill;
+}
+
+int main(void)
+{
+    unsigned int test_units[] = {0, 100, 150, 200, 350};
+    long long total = 0;
+    long long district_total;
+    int i;
+
+    printf("=== TASK 11: FINAL DESIGN TEST ===\n\n");
+
+    printf("int size: %zu bytes\n", sizeof(int));
+    printf("long long size: %zu bytes\n", sizeof(long long));
+    printf("INT_MAX: %d\n", INT_MAX);
+    printf("LLONG_MAX: %lld\n\n", LLONG_MAX);
+
+    printf("Units\tExpected (paise)\tActual (paise)\tResult\n");
+
+    for (i = 0; i < 5; i++) {
+        long long expected[] = {5000, 5000, 16250, 27500, 95000};
+        long long actual = calculate_bill(test_units[i]);
+
+        printf("%u\t%lld\t\t%lld\t\t%s\n",
+               test_units[i], expected[i], actual,
+               expected[i] == actual ? "PASS" : "FAIL");
+
+        total += actual;
+    }
+
+    printf("\nTotal of five bills: Rs %lld.%02lld\n",
+           total / 100, total % 100);
+
+    district_total = calculate_bill(350) * (long long)DISTRICT_BILLS;
+
+    printf("District bills: %d\n", DISTRICT_BILLS);
+    printf("Total for 800000 bills at 350 units: Rs %lld.%02lld\n",
+           district_total / 100, district_total % 100);
+
+    printf("\nRecommended design:\n");
+    printf("1. unsigned int for validated meter readings and units.\n");
+    printf("2. long long for money stored in paise and district totals.\n");
+    printf("3. #define for slab limits and fixed tariff constants.\n");
+    printf("4. Include guards in shared header files.\n");
+    printf("5. Use scanf return-value checks and validate all readings.\n");
+    printf("6. Check district totals against LLONG_MAX before accumulation.\n");
+
+    return 0;
+}
